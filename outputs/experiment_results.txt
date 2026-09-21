@@ -1,0 +1,90 @@
+======================================================================
+Part A/B: N-gram perplexity - bigram vs trigram, and add-k sweep
+======================================================================
+Perplexity on held-out 10% of each book. Tokenizer + LM trained on the
+other 90%. Lower perplexity = better next-token prediction.
+
+--- Tolkien  (vocab=5000, whitespace pre-tok) ---
+model           k   perplexity
+unigram       1.0       446.96
+unigram       0.1       446.29
+unigram      0.01       447.70
+unigram     0.001       449.18
+bigram        1.0       915.37
+bigram        0.1       404.01
+bigram       0.01       292.28
+bigram      0.001       356.93
+trigram       1.0      2974.42
+trigram       0.1      1884.21
+trigram      0.01      1327.49
+trigram     0.001      1354.69
+
+--- Conan-Doyle  (vocab=5000, whitespace pre-tok) ---
+model           k   perplexity
+unigram       1.0       573.36
+unigram       0.1       572.43
+unigram      0.01       575.10
+unigram     0.001       577.96
+bigram        1.0      1179.51
+bigram        0.1       521.64
+bigram       0.01       370.82
+bigram      0.001       463.18
+trigram       1.0      3339.39
+trigram       0.1      2239.16
+trigram      0.01      1638.33
+trigram     0.001      1674.38
+
+======================================================================
+Part A: Tokenizer Exploration, vocab size + pre-tokenization
+======================================================================
+Trigram perplexity (k=0.01) on held-out 10% of The Hobbit for each
+tokenizer setting. Also reports avg tokens/word (fertility).
+
+pre-tok             vocab  actual  tok/word   trigram PP
+whitespace           1000    1000      1.61       195.45
+whitespace           3000    3000      1.33       799.58
+whitespace           5000    5000      1.27      1327.49
+whitespace          10000    5743      1.26      1501.07
+whitespace_lower     1000    1000      1.55       204.10
+whitespace_lower     3000    3000      1.30       762.66
+whitespace_lower     5000    5000      1.25      1224.19
+whitespace_lower    10000    5267      1.24      1280.85
+bytelevel            1000    1000      1.97        94.39
+bytelevel            3000    3000      1.55       459.72
+bytelevel            5000    5000      1.46       812.59
+bytelevel           10000    7371      1.41      1181.63
+
+Note: perplexity is only comparable at a *fixed* vocabulary/tokenization,
+because changing the vocab changes what a 'token' is. We read these as
+trends, and rely on author-ID accuracy mentioned below for the final choice.
+
+======================================================================
+Part C: AUTHOR IDENTIFICATION - held-out accuracy + hyper-param sweep
+======================================================================
+Hold out 12% of each book as short ~40-word passages, the labelled test
+set), train the identifier on the rest, and measure classification
+accuracy. This tells us which (n, k, vocab) to commit to.
+
+Labelled test passages: 100 (50 Tolkien / 50 Conan-Doyle)
+
+  n       k   vocab           pre-tok   accuracy
+  1     1.0    2000        whitespace      1.000
+  1     1.0    5000        whitespace      1.000
+  1     0.1    2000        whitespace      1.000
+  1     0.1    5000        whitespace      1.000
+  1    0.01    2000        whitespace      1.000
+  1    0.01    5000        whitespace      1.000
+  2     1.0    2000        whitespace      0.990
+  2     1.0    5000        whitespace      0.980
+  2     0.1    2000        whitespace      1.000
+  2     0.1    5000        whitespace      0.980
+  2    0.01    2000        whitespace      1.000
+  2    0.01    5000        whitespace      0.980
+  3     1.0    2000        whitespace      0.970
+  3     1.0    5000        whitespace      0.970
+  3     0.1    2000        whitespace      0.980
+  3     0.1    5000        whitespace      0.980
+  3    0.01    2000        whitespace      0.980
+  3    0.01    5000        whitespace      0.970
+
+Best: accuracy=1.000 with n=1, k=1.0, vocab=2000, pre-tok=whitespace

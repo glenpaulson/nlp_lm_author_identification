@@ -1,0 +1,10 @@
+Author-identification evaluation on our held-out test set
+============================================================
+Config: n=2, k=0.1, vocab=2000, pre-tok=whitespace
+Test passages: 120 (held out, never seen in training)
+Accuracy: 1.000
+
+Confusion matrix (rows = true author, cols = predicted):
+                Conan-Doyle     Tolkien         
+Conan-Doyle     60              0               
+Tolkien         0               60              
